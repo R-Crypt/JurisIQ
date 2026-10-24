@@ -156,10 +156,10 @@ export async function GET(request: NextRequest) {
     }> = [];
 
     // Parse blocks matching: #### [Title](link)\n\nHeadline snippet...
-    const blockRegex = /####\s+\[\*\*?(.+?)\*\*?\]\(https:\/\/indiankanoon\.org\/doc(?:fragment)?\/(\d+)[^)]*\)\s*\n+([\s\S]*?)(?=(?:####|\n\n---\n\n|$))/g;
+    const blockRegex = /####\s+\[([\s\S]+?)\]\(https:\/\/indiankanoon\.org\/doc(?:fragment)?\/(\d+)[^)]*\)\s*\n+([\s\S]*?)(?=(?:####|$))/g;
     let match;
     while ((match = blockRegex.exec(markdown)) !== null) {
-      const rawTitle = match[1].replace(/\*\*/g, "").trim();
+      const rawTitle = match[1].replace(/\*\*/g, "").replace(/\s+/g, " ").trim();
       const tid = match[2];
       const snippet = match[3].replace(/\*\*/g, "").trim().slice(0, 450);
 
