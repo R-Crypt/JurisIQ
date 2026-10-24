@@ -18,6 +18,7 @@ import { CaseDocument } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TrueCopyModal } from "@/components/TrueCopyModal";
 
 interface JudgmentReaderProps {
   doc: CaseDocument;
@@ -35,6 +36,7 @@ export function JudgmentReader({
   const [fontSize, setFontSize] = useState<"sm" | "md" | "lg" | "xl">("md");
   const [fontFamily, setFontFamily] = useState<"serif" | "sans">("serif");
   const [activeTab, setActiveTab] = useState("judgment");
+  const [showTrueCopy, setShowTrueCopy] = useState(false);
 
   const handleCopyCitation = () => {
     const textToCopy = doc.citation || doc.title;
@@ -61,9 +63,14 @@ export function JudgmentReader({
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 print:p-0 print:max-w-none">
-      {/* Top Toolbar (Hidden when printing) */}
-      <div className="print:hidden flex flex-wrap items-center justify-between gap-3 pb-3 mb-6 border-b border-slate-200">
+    <>
+      <div
+        className={`max-w-5xl mx-auto px-4 py-6 print:p-0 print:max-w-none ${
+          showTrueCopy ? "print:hidden" : ""
+        }`}
+      >
+        {/* Top Toolbar (Hidden when printing) */}
+        <div className="print:hidden flex flex-wrap items-center justify-between gap-3 pb-3 mb-6 border-b border-slate-200">
         <Button
           variant="ghost"
           size="sm"
@@ -119,6 +126,17 @@ export function JudgmentReader({
             ))}
           </div>
 
+          {/* Download True Copy Button */}
+          <Button
+            size="sm"
+            onClick={() => setShowTrueCopy(true)}
+            className="bg-[#710c23] hover:bg-[#850e2a] text-white text-xs h-8 px-3 rounded-md font-medium cursor-pointer shadow-xs flex items-center gap-1.5"
+            title="Download certified court copy with official seal and order QR code"
+          >
+            <FileCheck2 className="size-3.5" />
+            <span>Download True Copy</span>
+          </Button>
+
           {/* Print Button */}
           <Button
             variant="outline"
@@ -127,7 +145,7 @@ export function JudgmentReader({
             className="text-xs h-8 border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer"
             title="Print or Save as PDF"
           >
-            <Printer className="size-3.5 mr-1.5 text-[#710c23]" />
+            <Printer className="size-3.5 mr-1.5 text-slate-600" />
             <span>Print / PDF</span>
           </Button>
 
@@ -167,13 +185,14 @@ export function JudgmentReader({
               <Building2 className="size-3 mr-1 text-[#710c23]" />
               {doc.docsource || "Supreme Court of India"}
             </Badge>
-            <Badge
-              variant="outline"
-              className="text-[11px] px-2.5 py-0.5 border-emerald-300 text-emerald-800 bg-emerald-50 font-sans"
+            <button
+              onClick={() => setShowTrueCopy(true)}
+              className="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 cursor-pointer transition-colors font-sans"
+              title="Click to view and download official court certified True Copy"
             >
-              <FileCheck2 className="size-3 mr-1" />
-              Authenticated Judgment Copy
-            </Badge>
+              <FileCheck2 className="size-3 mr-1 text-emerald-600" />
+              <span>Certified True Copy Available</span>
+            </button>
           </div>
 
           {/* Case Title */}
@@ -438,5 +457,13 @@ export function JudgmentReader({
         />
       </div>
     </div>
-  );
+
+    {/* Certified True Copy Modal */}
+    <TrueCopyModal
+      doc={doc}
+      isOpen={showTrueCopy}
+      onClose={() => setShowTrueCopy(false)}
+    />
+  </>
+);
 }

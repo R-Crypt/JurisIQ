@@ -55,6 +55,7 @@ export interface SearchFilters {
   bench?: string;
   title?: string;
   citation?: string;
+  scope?: "all" | "title" | "body";
 }
 
 export interface LandmarkPreset {

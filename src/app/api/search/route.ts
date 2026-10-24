@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
   const bench = searchParams.get("bench") ?? "";
   const title = searchParams.get("title") ?? "";
   const citation = searchParams.get("citation") ?? "";
+  const scope = searchParams.get("scope") ?? "all";
 
   if (!query && !title && !citation) {
     return NextResponse.json(
@@ -32,15 +33,27 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Build formInput with filters
-  let formInput = query.trim();
+  // Build formInput with filters and keyword location scope
+  let formInput = "";
+  if (query) {
+    if (scope === "title") {
+      formInput = `title:${query.trim()}`;
+    } else if (scope === "body") {
+      formInput = `${query.trim()} NOTT title:${query.trim()}`;
+    } else {
+      formInput = query.trim();
+    }
+  }
+
   if (doctype && doctype !== "all") formInput += ` doctypes:${doctype}`;
   if (fromDate) formInput += ` fromdate:${fromDate}`;
   if (toDate) formInput += ` todate:${toDate}`;
   if (author) formInput += ` author:${author}`;
   if (bench) formInput += ` bench:${bench}`;
-  if (title) formInput += ` title:${title}`;
+  if (title && scope !== "title") formInput += ` title:${title}`;
   if (citation) formInput += ` cite:${citation}`;
+
+  formInput = formInput.trim();
 
   const directUrl = `${IK_BASE}/search/?formInput=${encodeURIComponent(formInput.trim())}&pagenum=${page}`;
 

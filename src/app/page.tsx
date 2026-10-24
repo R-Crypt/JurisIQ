@@ -33,6 +33,7 @@ export default function Home() {
     fromDate?: string;
     toDate?: string;
     doctype?: string;
+    scope?: "all" | "title" | "body";
   }>({ query: "" });
 
   const executeSearch = async (
@@ -45,6 +46,7 @@ export default function Home() {
       fromDate?: string;
       toDate?: string;
       doctype?: string;
+      scope?: "all" | "title" | "body";
     },
     page = 0
   ) => {
@@ -64,6 +66,7 @@ export default function Home() {
       if (params.fromDate) urlParams.set("fromDate", params.fromDate);
       if (params.toDate) urlParams.set("toDate", params.toDate);
       if (params.doctype) urlParams.set("doctype", params.doctype);
+      if (params.scope) urlParams.set("scope", params.scope);
       urlParams.set("page", page.toString());
 
       const res = await fetch(`/api/search?${urlParams.toString()}`);

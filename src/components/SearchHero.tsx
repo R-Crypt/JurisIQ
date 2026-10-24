@@ -26,6 +26,7 @@ interface SearchHeroProps {
     fromDate?: string;
     toDate?: string;
     doctype?: string;
+    scope?: "all" | "title" | "body";
   }) => void;
   isLoading: boolean;
 }
@@ -35,6 +36,7 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
   const [query, setQuery] = useState("");
   const [caseTitle, setCaseTitle] = useState("");
   const [citation, setCitation] = useState("");
+  const [keywordScope, setKeywordScope] = useState<"all" | "title" | "body">("all");
 
   // Advanced filters
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -73,6 +75,7 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
       fromDate: fromYear ? `1-1-${fromYear}` : undefined,
       toDate: toYear ? `31-12-${toYear}` : undefined,
       doctype,
+      scope: activeTab === "general" ? keywordScope : undefined,
     });
   };
 
@@ -221,6 +224,48 @@ export function SearchHero({ onSearch, isLoading }: SearchHeroProps) {
               )}
             </Button>
           </div>
+
+          {/* Keyword Location Scope Option */}
+          {activeTab === "general" && (
+            <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2 text-xs font-sans">
+              <span className="text-slate-500 font-medium">Search Keyword In:</span>
+              <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setKeywordScope("all")}
+                  className={`px-3 py-1 rounded-md text-xs transition-colors cursor-pointer ${
+                    keywordScope === "all"
+                      ? "bg-white text-slate-900 shadow-xs font-semibold"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Entire Judgment (Full Text)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setKeywordScope("title")}
+                  className={`px-3 py-1 rounded-md text-xs transition-colors cursor-pointer ${
+                    keywordScope === "title"
+                      ? "bg-white text-[#710c23] shadow-xs font-semibold"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Case Title Only
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setKeywordScope("body")}
+                  className={`px-3 py-1 rounded-md text-xs transition-colors cursor-pointer ${
+                    keywordScope === "body"
+                      ? "bg-white text-[#710c23] shadow-xs font-semibold"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Rest of the Judgment (Body Only)
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Advanced Filter Drawer */}
           {showAdvanced && (
