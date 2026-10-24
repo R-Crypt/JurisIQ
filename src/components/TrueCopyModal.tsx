@@ -50,6 +50,13 @@ export function TrueCopyModal({ doc, isOpen, onClose }: TrueCopyModalProps) {
     decisionDate = dateMatch[1];
   }
 
+  // Clean bench string to remove markdown links or URLs
+  const cleanBench = (doc.bench || "THE HONOURABLE CHIEF JUSTICE & JUSTICES OF THE APEX COURT")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/https?:\/\/\S+/gi, "")
+    .replace(/Indian\s*Kanoon/gi, "")
+    .trim();
+
   const handlePrint = () => {
     window.print();
   };
@@ -187,7 +194,7 @@ export function TrueCopyModal({ doc, isOpen, onClose }: TrueCopyModalProps) {
               CORAM
             </p>
             <p className="text-sm font-bold uppercase text-slate-900 leading-snug">
-              {doc.bench || "THE HONOURABLE CHIEF JUSTICE & JUSTICES OF THE APEX COURT"}
+              {cleanBench}
             </p>
           </div>
 

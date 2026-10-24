@@ -145,9 +145,14 @@ export async function GET(
     let rawTitle = titleMatch ? titleMatch[1].trim() : `Supreme Court Judgment #${id}`;
     rawTitle = rawTitle.replace(/\s*-\s*Indian Kanoon/gi, "").trim();
 
-    // Extract Bench
+    // Extract Bench & clean markdown links / source URLs
     const benchMatch = markdown.match(/Bench:\s*(.+)/i);
-    const benchText = benchMatch ? benchMatch[1].trim() : "";
+    let benchText = benchMatch ? benchMatch[1].trim() : "";
+    benchText = benchText
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/https?:\/\/\S+/gi, "")
+      .replace(/Indian\s*Kanoon/gi, "")
+      .trim();
 
     // Extract Citations
     const citationMatch = markdown.match(/Equivalent citations:\s*(.+)/i);
@@ -156,8 +161,8 @@ export async function GET(
     // Extract Cites & Cited by
     let citesCount = 0;
     let citedByCount = 0;
-    const citesMatch = markdown.match(/\[\s*Cites\s*(\d+)/i);
-    const citedByMatch = markdown.match(/Cited by\s*(\d+)/i);
+    const citesMatch = markdown.match(/Cites\D+(\d+)/i);
+    const citedByMatch = markdown.match(/Cited\s+by\D+(\d+)/i);
     if (citesMatch) citesCount = parseInt(citesMatch[1], 10);
     if (citedByMatch) citedByCount = parseInt(citedByMatch[1], 10);
 
@@ -186,7 +191,7 @@ export async function GET(
     }
 
     // Skip all top-level portal navigation down to [Cites ..., Cited by ...]
-    const citesMatchIndex = bodyContent.search(/\[\s*Cites\s*\d+/i);
+    const citesMatchIndex = bodyContent.search(/\[?\s*Cites\b/i);
     if (citesMatchIndex !== -1) {
       const newlineAfterCites = bodyContent.indexOf("\n", citesMatchIndex);
       if (newlineAfterCites !== -1) {
@@ -200,14 +205,19 @@ export async function GET(
       bodyContent = bodyContent.substring(0, footerIndex);
     }
 
-    // Remove remaining navigation lines
-    bodyContent = bodyContent.replace(/^.*(?:Indian Kanoon|Skip to main content|Prism AI|IKademy|Premium|Legal Document View|Select the following parts).*$/gm, "");
+    // Remove remaining navigation lines and source references
+    bodyContent = bodyContent.replace(/^.*(?:Indian Kanoon|Skip to main content|Prism AI|IKademy|Premium|Legal Document View|Select the following parts|\[\s*Cites\b|Cited by\b).*$/gim, "");
+    bodyContent = bodyContent.replace(/\[\s*Cites[\s\S]*?Cited\s+by[\s\S]*?\]/gi, "");
 
-    // Convert Markdown links to interactive reader tags
+    // Convert doc links to internal interactive reader tags, and strip other external links
     bodyContent = bodyContent.replace(
       /\[([^\]]+)\]\(https:\/\/indiankanoon\.org\/doc\/(\d+)\/?\)/g,
       '<a href="#doc-$2" data-juris-tid="$2" class="juris-internal-doc text-[#710c23] font-medium hover:underline hover:text-[#991b1b] transition-colors cursor-pointer">$1</a>'
     );
+    // Strip any remaining search links or domain mentions
+    bodyContent = bodyContent.replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g, "$1");
+    bodyContent = bodyContent.replace(/https?:\/\/\S+/gi, "");
+    bodyContent = bodyContent.replace(/Indian\s*Kanoon/gi, "Official Law Reports");
 
     // Convert Markdown paragraphs into HTML
     const paragraphs = bodyContent
