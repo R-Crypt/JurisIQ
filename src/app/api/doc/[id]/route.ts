@@ -13,6 +13,39 @@ const HEADERS = {
   "Upgrade-Insecure-Requests": "1",
 };
 
+function extractEscrInfo(citationsText: string, _title: string) {
+  // Try matching SCR citation e.g. [1987] 1 SCR 1080 or 1987 SCR (1)1080 or 1973 4 SCR 225
+  const scrMatch = citationsText.match(
+    /(?:\[|\()?(\d{4})(?:\]|\))?\s*(?:SCR\s*\((\d+)\)|(\d+)?\s*S\.?C\.?R\.?)\s*\(?(\d+)?\)?\s*(\d+)?/i
+  );
+
+  let escrCitation = "";
+  let escrUrl = "https://scr.sci.gov.in/scrsearch/";
+
+  if (scrMatch) {
+    const year = scrMatch[1];
+    const vol = scrMatch[2] || scrMatch[3] || "1";
+    const page = scrMatch[4] || scrMatch[5] || "";
+    if (page) {
+      escrCitation = `[${year}] ${vol} S.C.R. ${page}`;
+      escrUrl = `https://scr.sci.gov.in/scrsearch/?p=pdf_search/home&citation_yr=${year}&citation_vol=${vol}&citation_page=${page}`;
+    }
+  }
+
+  // Also check neutral citation e.g. 2023 INSC 582
+  const inscMatch = citationsText.match(/(\d{4})\s*INSC\s*(\d+)/i);
+  if (inscMatch) {
+    const inscYear = inscMatch[1];
+    const inscNo = inscMatch[2];
+    if (!escrCitation) {
+      escrCitation = `${inscYear} INSC ${inscNo}`;
+    }
+    escrUrl = `https://scr.sci.gov.in/scrsearch/?p=pdf_search/home&neu_cit_year=${inscYear}&neu_no=${inscNo}`;
+  }
+
+  return { escrCitation, escrUrl };
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -121,6 +154,8 @@ export async function GET(
       let docHtml = judgmentBody.html()?.trim() ?? "";
       docHtml = docHtml.replace(/Indian Kanoon/gi, "Law Reports Repository");
 
+      const { escrCitation, escrUrl } = extractEscrInfo(citationsText, rawTitle);
+
       return NextResponse.json({
         tid: id,
         title: rawTitle,
@@ -133,7 +168,8 @@ export async function GET(
         citedByCount,
         citationsInText,
         sourceUrl: `/doc/${id}`,
-        escrUrl: "https://scr.sci.gov.in/",
+        escrUrl,
+        escrCitation,
       });
     }
 
@@ -240,6 +276,8 @@ export async function GET(
       })
       .join("\n");
 
+    const { escrCitation, escrUrl } = extractEscrInfo(citationsText, rawTitle);
+
     return NextResponse.json({
       tid: id,
       title: rawTitle,
@@ -252,7 +290,8 @@ export async function GET(
       citedByCount,
       citationsInText,
       sourceUrl: `/doc/${id}`,
-      escrUrl: "https://scr.sci.gov.in/",
+      escrUrl,
+      escrCitation,
     });
   } catch (error) {
     console.error("Document fetch error:", error);

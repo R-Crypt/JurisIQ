@@ -44,6 +44,7 @@ export interface CaseDocument {
   citedbyList?: CitedCase[];
   sourceUrl: string;
   escrUrl?: string;
+  escrCitation?: string;
 }
 
 export interface SearchFilters {

@@ -420,17 +420,30 @@ export function JudgmentReader({
                 </p>
               </div>
 
-              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200">
-                <span className="text-xs font-semibold text-slate-700 block mb-1">
-                  Supreme Court e-SCR
-                </span>
+              <div className="p-4 rounded-lg bg-emerald-50/70 border border-emerald-200">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold text-emerald-950 block">
+                    Supreme Court e-SCR Repository
+                  </span>
+                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-xs font-bold">
+                    Official Source
+                  </span>
+                </div>
+                {doc.escrCitation && (
+                  <p className="text-xs font-mono font-bold text-[#710c23] mb-1">
+                    e-SCR Citation: {doc.escrCitation}
+                  </p>
+                )}
+                <p className="text-[11px] text-emerald-800/90 mb-2.5">
+                  Access digitized case records directly from the official Supreme Court Reports portal.
+                </p>
                 <a
-                  href="https://scr.sci.gov.in"
+                  href={doc.escrUrl || "https://scr.sci.gov.in/scrsearch/"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-[#710c23] hover:underline flex items-center gap-1.5 mt-1 font-medium"
+                  className="text-xs text-white bg-[#710c23] hover:bg-[#850e2a] px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 font-medium transition-colors cursor-pointer shadow-xs"
                 >
-                  <span>Search Official e-SCR Portal</span>
+                  <span>Source from scr.sci.gov.in</span>
                   <ExternalLink className="size-3" />
                 </a>
               </div>

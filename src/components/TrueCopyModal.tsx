@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { CaseDocument } from "@/lib/types";
-import { Printer, Download, X, Shield, ArrowLeft } from "lucide-react";
+import { Printer, Download, X, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TrueCopyModalProps {
@@ -17,8 +17,10 @@ export function TrueCopyModal({ doc, isOpen, onClose }: TrueCopyModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      // Generate QR code pointing to official court verification record
-      const verificationUrl = doc.escrUrl || `https://www.sci.gov.in/judgments?case=${encodeURIComponent(doc.tid)}`;
+      // Generate QR code pointing to official Supreme Court e-SCR verification portal
+      const verificationUrl =
+        doc.escrUrl ||
+        `https://scr.sci.gov.in/scrsearch/?p=pdf_search/home&text=${encodeURIComponent(doc.title)}`;
       QRCode.toDataURL(verificationUrl, {
         width: 140,
         margin: 1,
@@ -75,6 +77,17 @@ export function TrueCopyModal({ doc, isOpen, onClose }: TrueCopyModalProps) {
           </div>
 
           <div className="flex items-center gap-2">
+            <a
+              href={doc.escrUrl || "https://scr.sci.gov.in/scrsearch/"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs h-8 px-3 rounded-md cursor-pointer flex items-center gap-1.5 transition-colors"
+              title="Open official Supreme Court Reports e-SCR portal (scr.sci.gov.in)"
+            >
+              <ExternalLink className="size-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Source e-SCR (scr.sci.gov.in)</span>
+            </a>
+
             <Button
               onClick={handlePrint}
               size="sm"
@@ -115,18 +128,23 @@ export function TrueCopyModal({ doc, isOpen, onClose }: TrueCopyModalProps) {
 
           {/* Top Court Header Block with Emblem Seal & QR Code */}
           <div className="flex items-start justify-between border-b-2 border-slate-900/80 pb-6 mb-6">
-            {/* Left: Official WEB COPY Stamp & Record Verification (No Logo) */}
+            {/* Left: Official WEB COPY Stamp & Record Verification (Sourced from scr.sci.gov.in) */}
             <div className="flex flex-col items-start gap-1">
               <div className="text-left">
                 <span className="text-xl sm:text-2xl font-serif font-bold tracking-widest uppercase text-slate-700/90 block">
                   WEB COPY
                 </span>
                 <span className="text-[10px] font-sans font-semibold text-slate-600 uppercase tracking-wider block mt-0.5">
-                  DIGITALLY VERIFIED RECORD • TRUE COPY
+                  SUPREME COURT REPORTS (e-SCR) • TRUE COPY
                 </span>
-                <span className="text-[9px] text-slate-400 font-mono block mt-0.5">
-                  Reference: SC-{doc.tid}
+                <span className="text-[9px] text-slate-500 font-mono block mt-0.5">
+                  Source: https://scr.sci.gov.in/scrsearch/
                 </span>
+                {doc.escrCitation && (
+                  <span className="text-[10px] font-semibold text-[#710c23] bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-xs font-mono inline-block mt-1.5">
+                    Official e-SCR Citation: {doc.escrCitation}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -233,11 +251,11 @@ export function TrueCopyModal({ doc, isOpen, onClose }: TrueCopyModalProps) {
           {/* Certified Footer */}
           <div className="mt-14 pt-4 border-t border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500 font-sans">
             <div>
-              <span>https://www.sci.gov.in/judgments</span>
-              <span className="ml-2">( Authenticated Court True Copy )</span>
+              <span className="font-semibold text-slate-700">Source: https://scr.sci.gov.in/scrsearch/</span>
+              <span className="ml-2 text-slate-500">( Official Supreme Court Reports e-SCR Repository )</span>
             </div>
             <div>
-              <span>Digitally Certified Record</span>
+              <span>Digitally Certified Court Record</span>
               <span className="ml-2">•</span>
               <span className="ml-2 font-mono">SC ID #{doc.tid}</span>
             </div>
