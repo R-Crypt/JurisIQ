@@ -115,37 +115,17 @@ export function TrueCopyModal({ doc, isOpen, onClose }: TrueCopyModalProps) {
 
           {/* Top Court Header Block with Emblem Seal & QR Code */}
           <div className="flex items-start justify-between border-b-2 border-slate-900/80 pb-6 mb-6">
-            {/* Left: Official Emblem Seal & WEB COPY Stamp */}
-            <div className="flex items-center gap-3">
-              <div className="size-20 rounded-full border-2 border-emerald-800/40 p-1 flex items-center justify-center relative bg-emerald-50/30">
-                <svg
-                  viewBox="0 0 100 100"
-                  className="size-full text-emerald-800 fill-current opacity-80"
-                >
-                  <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2.5" />
-                  <circle cx="50" cy="50" r="41" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2,2" />
-                  <path d="M50 20 L53 32 L65 32 L55 40 L59 52 L50 44 L41 52 L45 40 L35 32 L47 32 Z" opacity="0.6" />
-                  <text x="50" y="65" textAnchor="middle" fontSize="6.5" fontWeight="bold" fontFamily="sans-serif">
-                    SUPREME COURT
-                  </text>
-                  <text x="50" y="73" textAnchor="middle" fontSize="5.5" fontWeight="bold" fontFamily="sans-serif">
-                    OF INDIA
-                  </text>
-                  <text x="50" y="82" textAnchor="middle" fontSize="6" fontFamily="sans-serif">
-                    सत्यमेव जयते
-                  </text>
-                </svg>
-                {/* Stamp overlay */}
-                <span className="absolute -bottom-2 -right-2 text-[9px] font-sans font-bold uppercase tracking-wider text-slate-500 border border-slate-400 bg-white px-1 rounded-xs">
+            {/* Left: Official WEB COPY Stamp & Record Verification (No Logo) */}
+            <div className="flex flex-col items-start gap-1">
+              <div className="text-left">
+                <span className="text-xl sm:text-2xl font-serif font-bold tracking-widest uppercase text-slate-700/90 block">
                   WEB COPY
                 </span>
-              </div>
-              <div className="text-left font-sans">
-                <span className="text-[10px] font-bold text-slate-700 tracking-wider uppercase block">
-                  DIGITALLY VERIFIED RECORD
+                <span className="text-[10px] font-sans font-semibold text-slate-600 uppercase tracking-wider block mt-0.5">
+                  DIGITALLY VERIFIED RECORD • TRUE COPY
                 </span>
-                <span className="text-[9px] text-slate-500 font-mono block">
-                  e-Court Copy Reference: SC-{doc.tid}
+                <span className="text-[9px] text-slate-400 font-mono block mt-0.5">
+                  Reference: SC-{doc.tid}
                 </span>
               </div>
             </div>
