@@ -185,7 +185,22 @@ export async function GET(
       bodyContent = bodyContent.substring(markerIdx + marker.length);
     }
 
-    // Remove navigation lines
+    // Skip all top-level portal navigation down to [Cites ..., Cited by ...]
+    const citesMatchIndex = bodyContent.search(/\[\s*Cites\s*\d+/i);
+    if (citesMatchIndex !== -1) {
+      const newlineAfterCites = bodyContent.indexOf("\n", citesMatchIndex);
+      if (newlineAfterCites !== -1) {
+        bodyContent = bodyContent.substring(newlineAfterCites + 1);
+      }
+    }
+
+    // Strip bottom footer fluff (tags, disclaimer, ads)
+    const footerIndex = bodyContent.search(/(?:Related AI tags|RELATED USER QUERIES|About\s+Disclaimer\s+Privacy)/i);
+    if (footerIndex !== -1) {
+      bodyContent = bodyContent.substring(0, footerIndex);
+    }
+
+    // Remove remaining navigation lines
     bodyContent = bodyContent.replace(/^.*(?:Indian Kanoon|Skip to main content|Prism AI|IKademy|Premium|Legal Document View|Select the following parts).*$/gm, "");
 
     // Convert Markdown links to interactive reader tags
